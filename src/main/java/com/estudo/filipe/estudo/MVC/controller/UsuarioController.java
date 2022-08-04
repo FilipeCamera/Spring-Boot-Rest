@@ -5,6 +5,7 @@ import javax.validation.Valid;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -19,6 +20,8 @@ import com.estudo.filipe.estudo.MVC.controller.dto.UsuarioDto;
 import com.estudo.filipe.estudo.MVC.model.Usuario;
 import com.estudo.filipe.estudo.MVC.service.UsuarioService;
 import org.springframework.beans.BeanUtils;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort.Direction;
@@ -36,6 +39,8 @@ public class UsuarioController {
 	}
 	
 	@PostMapping
+	@Transactional
+	@CacheEvict(value = "listaUsuarios", allEntries = true)
 	public ResponseEntity<Object> create(@RequestBody @Valid UsuarioDto usuarioDto) {
 		if(usuarioService.existsByEmail(usuarioDto.getEmail())) {
 			return ResponseEntity.status(HttpStatus.CONFLICT).body("Este usuário já existe!");
@@ -46,7 +51,8 @@ public class UsuarioController {
 	}
 	
 	@GetMapping
-	public ResponseEntity<Page<Usuario>> getAllUsuarios(@PageableDefault(page = 0, size = 10, sort ="îd", direction = Direction.ASC) Pageable pageable){
+	@Cacheable(value = "listaUsuarios")
+	public ResponseEntity<Page<Usuario>> getAllUsuarios(@PageableDefault(page = 0, size = 10, sort ="id", direction = Direction.ASC) Pageable pageable){
 		return ResponseEntity.status(HttpStatus.OK).body(usuarioService.findAll(pageable));
 	}
 	
@@ -62,6 +68,8 @@ public class UsuarioController {
 	}
 	
 	@PutMapping("/{id}")
+	@Transactional
+	@CacheEvict(value = "listaUsuarios", allEntries = true)
 	public ResponseEntity<Object> updateUsuario(@PathVariable(value = "id") Long id, @RequestBody @Valid UsuarioDto usuarioDto) {
 		Optional<Usuario> usuarioOptional = usuarioService.findById(id);
 		
@@ -85,6 +93,8 @@ public class UsuarioController {
 	}
 	
 	@DeleteMapping("/{id}")
+	@Transactional
+	@CacheEvict(value = "listaUsuarios", allEntries = true)
 	public ResponseEntity<Object> deleteUsuario(@PathVariable(value = "id") Long id) {
 		Optional<Usuario> usuarioOptional = usuarioService.findById(id);
 		
