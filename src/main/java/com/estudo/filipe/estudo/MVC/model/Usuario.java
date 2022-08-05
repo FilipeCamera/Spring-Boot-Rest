@@ -1,6 +1,5 @@
 package com.estudo.filipe.estudo.MVC.model;
 
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -12,7 +11,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 
 @Entity
 @Table(name = "users")
-public class Usuario implements Serializable, UserDetails {
+public class Usuario implements UserDetails {
 	
 	private static final long serialVersionUID = 1L;
 	

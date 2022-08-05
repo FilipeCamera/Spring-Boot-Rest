@@ -5,6 +5,7 @@ import javax.validation.Valid;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -33,9 +34,10 @@ import org.springframework.data.web.PageableDefault;
 public class UsuarioController {
 	
 	final UsuarioService usuarioService;
-	
-	public UsuarioController(UsuarioService usuarioService) {
+	final PasswordEncoder passwordEncoder;
+	public UsuarioController(UsuarioService usuarioService, PasswordEncoder passwordEncoder) {
 		this.usuarioService = usuarioService;
+		this.passwordEncoder = passwordEncoder;
 	}
 	
 	@PostMapping
@@ -45,6 +47,7 @@ public class UsuarioController {
 		if(usuarioService.existsByEmail(usuarioDto.getEmail())) {
 			return ResponseEntity.status(HttpStatus.CONFLICT).body("Este usuário já existe!");
 		}
+		usuarioDto.setSenha(passwordEncoder.encode(usuarioDto.getSenha()));
 		var usuario = new Usuario();
 		BeanUtils.copyProperties(usuarioDto, usuario);
 		return ResponseEntity.status(HttpStatus.CREATED).body(usuarioService.save(usuario));
