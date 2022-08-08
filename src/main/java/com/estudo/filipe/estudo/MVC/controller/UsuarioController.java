@@ -20,6 +20,9 @@ import org.springframework.web.bind.annotation.RestController;
 import com.estudo.filipe.estudo.MVC.controller.dto.UsuarioDto;
 import com.estudo.filipe.estudo.MVC.model.Usuario;
 import com.estudo.filipe.estudo.MVC.service.UsuarioService;
+
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+
 import org.springframework.beans.BeanUtils;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
@@ -60,6 +63,7 @@ public class UsuarioController {
 	}
 	
 	@GetMapping("/{id}")
+	@SecurityRequirement(name = "Bearer Authentication")
 	public ResponseEntity<Object> getOneUsuario(@PathVariable(value = "id") Long id) {
 		Optional<Usuario> usuarioOptional = usuarioService.findById(id);
 		
@@ -72,6 +76,7 @@ public class UsuarioController {
 	
 	@PutMapping("/{id}")
 	@Transactional
+	@SecurityRequirement(name = "Bearer Authentication")
 	@CacheEvict(value = "listaUsuarios", allEntries = true)
 	public ResponseEntity<Object> updateUsuario(@PathVariable(value = "id") Long id, @RequestBody @Valid UsuarioDto usuarioDto) {
 		Optional<Usuario> usuarioOptional = usuarioService.findById(id);
@@ -98,6 +103,7 @@ public class UsuarioController {
 	@DeleteMapping("/{id}")
 	@Transactional
 	@CacheEvict(value = "listaUsuarios", allEntries = true)
+	@SecurityRequirement(name = "Bearer Authentication")
 	public ResponseEntity<Object> deleteUsuario(@PathVariable(value = "id") Long id) {
 		Optional<Usuario> usuarioOptional = usuarioService.findById(id);
 		
